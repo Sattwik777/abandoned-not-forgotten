@@ -21,7 +21,11 @@ export default function StorySection({
   onNavigateToMap
 }) {
   const [activeTab, setActiveTab] = useState('story'); // 'story' | 'anatomy' | 'science' | 'data'
-  const [selectedPart, setSelectedPart] = useState(mission.hardwareAnatomy[0]);
+  const [selectedPart, setSelectedPart] = useState(
+    mission.hardwareAnatomy && mission.hardwareAnatomy.length > 0 
+      ? mission.hardwareAnatomy[0] 
+      : { part: 'Hardware System', description: 'Robotic component' }
+  );
   const [quizAnswer, setQuizAnswer] = useState(null);
   const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
   const [isNarrating, setIsNarrating] = useState(false);
@@ -64,7 +68,7 @@ export default function StorySection({
         {/* Glow Accent Border */}
         <div 
           className="absolute -top-32 -right-32 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-20"
-          style={{ background: mission.atmosphericTheme.particleColor }}
+          style={{ background: mission.celestialBody === 'mars' ? 'rgba(235, 110, 60, 0.5)' : 'rgba(180, 210, 255, 0.5)' }}
         />
 
         {/* Top Badges & Controls */}
