@@ -11,12 +11,6 @@ export default function SolarSystemHero({ onJumpToMoon, onJumpToMars, onBeginJou
 
   return (
     <section className="relative min-h-[92vh] flex flex-col items-center justify-center text-center max-w-5xl mx-auto py-12 px-4 select-none">
-      
-      {/* Top Hackathon Badge */}
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold uppercase tracking-wider mb-4 backdrop-blur-md shadow-lg animate-fadeIn">
-        <Sparkles className="w-4 h-4 text-amber-400" />
-        <span>NASA Space Apps Challenge 2026</span>
-      </div>
 
       <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white mb-4 leading-tight">
         Abandoned but <br />
@@ -51,10 +45,10 @@ export default function SolarSystemHero({ onJumpToMoon, onJumpToMars, onBeginJou
         <div className="absolute w-44 h-44 sm:w-56 sm:h-56 rounded-full border border-slate-800/80 pointer-events-none" />
 
         {/* Orbit Ring 3: Earth & Moon (Target Destination 1!) */}
-        <div className="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full border border-cyan-500/30 animate-spin-slow">
+        <div className="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full border border-cyan-500/30 animate-spin-slow pointer-events-none">
           {/* Earth & Moon System */}
           <div
-            className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 cursor-pointer group"
+            className="absolute -top-5 left-1/2 -translate-x-1/2 flex items-center gap-2 cursor-pointer group pointer-events-auto z-30 p-2"
             onClick={onJumpToMoon}
             onMouseEnter={() =>
               setHoveredPlanet({
@@ -72,12 +66,12 @@ export default function SolarSystemHero({ onJumpToMoon, onJumpToMars, onBeginJou
             </div>
 
             {/* Orbiting Moon */}
-            <div className="w-5 h-5 rounded-full bg-slate-300 border border-white shadow-[0_0_12px_rgba(255,255,255,0.8)] flex items-center justify-center animate-bounce">
+            <div className="w-5 h-5 rounded-full bg-slate-200 border border-white shadow-[0_0_14px_rgba(255,255,255,0.9)] flex items-center justify-center animate-bounce">
               <span className="text-[7px]">🌕</span>
             </div>
 
             {/* Pulsing Tag */}
-            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 font-mono text-[9px] font-bold border border-cyan-600 shadow-md">
+            <span className="px-2 py-0.5 rounded bg-cyan-950/90 text-cyan-300 font-mono text-[9px] font-bold border border-cyan-400 shadow-md group-hover:bg-cyan-900 transition">
               THE MOON (Click!)
             </span>
           </div>
@@ -85,12 +79,12 @@ export default function SolarSystemHero({ onJumpToMoon, onJumpToMars, onBeginJou
 
         {/* Orbit Ring 4: Mars (Target Destination 2!) */}
         <div 
-          className="absolute w-88 h-88 sm:w-[440px] sm:h-[440px] rounded-full border border-amber-500/30 animate-spin-slow"
+          className="absolute w-88 h-88 sm:w-[440px] sm:h-[440px] rounded-full border border-amber-500/30 animate-spin-slow pointer-events-none"
           style={{ animationDuration: '35s' }}
         >
           {/* Mars & Moons */}
           <div
-            className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 cursor-pointer group"
+            className="absolute -top-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 cursor-pointer group pointer-events-auto z-20 p-2"
             onClick={onJumpToMars}
             onMouseEnter={() =>
               setHoveredPlanet({
@@ -106,7 +100,7 @@ export default function SolarSystemHero({ onJumpToMoon, onJumpToMars, onBeginJou
               <span className="text-[8px] font-bold text-white">🔴</span>
             </div>
 
-            <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 font-mono text-[9px] font-bold border border-amber-600 shadow-md">
+            <span className="px-2 py-0.5 rounded bg-amber-950/90 text-amber-300 font-mono text-[9px] font-bold border border-amber-400 shadow-md group-hover:bg-amber-900 transition">
               MARS (Click!)
             </span>
           </div>

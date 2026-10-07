@@ -42,11 +42,8 @@ export default function Navbar({
             <Rocket className="w-5 h-5 -rotate-45" />
           </div>
           <div>
-            <h1 className="text-sm font-black text-white tracking-wider uppercase flex items-center gap-1.5">
-              <span>Echoes in the Dust</span>
-              <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">
-                NASA
-              </span>
+            <h1 className="text-sm font-black text-white tracking-wider uppercase">
+              Echoes in the Dust
             </h1>
             <p className="text-[10px] text-slate-400 font-mono hidden sm:block">
               Silent Scouts of the Moon & Mars
