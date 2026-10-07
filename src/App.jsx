@@ -1,246 +1,278 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import BackgroundAtmosphere from './components/BackgroundAtmosphere';
-import SolarSystemHero from './components/SolarSystemHero';
+import GalaxyBackground from './components/GalaxyBackground';
+import CinematicLoader from './components/CinematicLoader';
+import HomeHero from './components/HomeHero';
+import ArtifactExplorer from './components/ArtifactExplorer';
+import MoonDestinationView from './components/MoonDestinationView';
+import MarsDestinationView from './components/MarsDestinationView';
+import ArtifactStoryView from './components/ArtifactStoryView';
+import TimelineSection from './components/TimelineSection';
 import PlanetaryMap from './components/PlanetaryMap';
-import StorySection from './components/StorySection';
-import NasaDataRegistryModal from './components/NasaDataRegistryModal';
-import EducatorGuideModal from './components/EducatorGuideModal';
+import ScienceSection from './components/ScienceSection';
+import EducationalSection from './components/EducationalSection';
+import SourcesSection from './components/SourcesSection';
+import Footer from './components/Footer';
 import { HARDWARE_REGISTRY } from './data/hardwareData';
-import { Award, ExternalLink } from 'lucide-react';
+import { spaceAudio } from './utils/audioSystem';
 
 export default function App() {
-  const [activeMissionId, setActiveMissionId] = useState(HARDWARE_REGISTRY[0].id);
-  const [currentEnvironment, setCurrentEnvironment] = useState('space'); // 'space' | 'moon' | 'mars'
-  const [unlockedBadges, setUnlockedBadges] = useState(new Set());
-  const [isDataModalOpen, setIsDataModalOpen] = useState(false);
-  const [isEducatorModalOpen, setIsEducatorModalOpen] = useState(false);
-  const storiesContainerRef = useRef(null);
+  const [showLoader, setShowLoader] = useState(true);
+  const [currentView, setCurrentView] = useState('home');
+  const [selectedArtifactId, setSelectedArtifactId] = useState(HARDWARE_REGISTRY[0].id);
+  const [unlockedBadges, setUnlockedBadges] = useState(() => {
+    try {
+      const saved = localStorage.getItem('offworld_unlocked_badges');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+  const [isAudioMuted, setIsAudioMuted] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(() => {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  });
 
-  const activeMission = HARDWARE_REGISTRY.find((m) => m.id === activeMissionId) || HARDWARE_REGISTRY[0];
+  // Active artifact reference
+  const activeArtifact = HARDWARE_REGISTRY.find((m) => m.id === selectedArtifactId) || HARDWARE_REGISTRY[0];
 
-  // Dynamic scroll tracker that reliably identifies whether you're in Space, Moon, or Mars
+  // Derive celestial environment for dynamic LERP background
+  const currentEnvironment = (() => {
+    if (currentView === 'moon') return 'moon';
+    if (currentView === 'mars') return 'mars';
+    if (currentView === 'story') {
+      const world = activeArtifact.world || activeArtifact.celestialBody;
+      return world === 'mars' ? 'mars' : 'moon';
+    }
+    return 'space';
+  })();
+
+  // Synchronize routing with browser hash history
   useEffect(() => {
-    const handleScroll = () => {
-      const centerY = window.innerHeight / 2;
-
-      // 1. Check Solar System Hero
-      const heroEl = document.getElementById('solar-system-hero');
-      if (heroEl) {
-        const rect = heroEl.getBoundingClientRect();
-        if (rect.top <= centerY && rect.bottom >= centerY) {
-          setCurrentEnvironment('space');
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '') || 'home';
+      if (hash.startsWith('story/')) {
+        const id = hash.replace('story/', '');
+        const exists = HARDWARE_REGISTRY.some((m) => m.id === id);
+        if (exists) {
+          setSelectedArtifactId(id);
+          setCurrentView('story');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           return;
         }
       }
 
-      // 2. Check Planetary Map
-      const mapEl = document.getElementById('planetary-map-section');
-      if (mapEl) {
-        const rect = mapEl.getBoundingClientRect();
-        if (rect.top <= centerY && rect.bottom >= centerY) {
-          setCurrentEnvironment('space');
-          return;
-        }
-      }
-
-      // 3. Find closest story card to viewport center
-      const cards = document.querySelectorAll('article[data-mission-id]');
-      let closestMission = null;
-      let minDistance = Infinity;
-
-      cards.forEach((card) => {
-        const rect = card.getBoundingClientRect();
-        const cardCenter = (rect.top + rect.bottom) / 2;
-        const dist = Math.abs(cardCenter - centerY);
-        if (dist < minDistance) {
-          minDistance = dist;
-          const missionId = card.getAttribute('data-mission-id');
-          closestMission = HARDWARE_REGISTRY.find((m) => m.id === missionId);
-        }
-      });
-
-      if (closestMission) {
-        setActiveMissionId(closestMission.id);
-        setCurrentEnvironment(closestMission.celestialBody); // 'moon' or 'mars'
+      const validViews = ['home', 'explore', 'moon', 'mars', 'timeline', 'map', 'science', 'education', 'sources'];
+      if (validViews.includes(hash)) {
+        setCurrentView(hash);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Trigger immediately on mount
+    window.addEventListener('hashchange', handleHashChange);
+    // Initial sync
+    if (window.location.hash) {
+      handleHashChange();
+    }
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  const handleUnlockBadge = (missionId) => {
-    setUnlockedBadges((prev) => new Set([...prev, missionId]));
+  // Save badges to localStorage
+  const handleUnlockBadge = (id) => {
+    setUnlockedBadges((prev) => {
+      const next = new Set([...prev, id]);
+      try {
+        localStorage.setItem('offworld_unlocked_badges', JSON.stringify([...next]));
+      } catch (e) {
+        console.warn(e);
+      }
+      return next;
+    });
   };
 
-  const scrollToStory = (missionId) => {
-    const el = document.getElementById(`story-${missionId}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Safe navigation function with hash update
+  const navigateTo = (view, artifactId = null) => {
+    if (view === 'story' && artifactId) {
+      setSelectedArtifactId(artifactId);
+      setCurrentView('story');
+      window.location.hash = `#story/${artifactId}`;
+    } else {
+      setCurrentView(view);
+      window.location.hash = `#${view}`;
+    }
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+  };
+
+  // Toggle ambient space acoustics
+  const handleToggleAudio = () => {
+    if (isAudioMuted) {
+      spaceAudio.init();
+      spaceAudio.playQuindarTone();
+      if (currentEnvironment === 'mars') {
+        spaceAudio.startMartianWind();
+      }
+      setIsAudioMuted(false);
+    } else {
+      spaceAudio.stopMartianWind();
+      spaceAudio.stopSpeaking();
+      setIsAudioMuted(true);
     }
   };
 
-  const scrollToMap = () => {
-    const el = document.getElementById('planetary-map-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+  // Adjust wind when environment changes and audio is enabled
+  useEffect(() => {
+    if (!isAudioMuted) {
+      if (currentEnvironment === 'mars') {
+        spaceAudio.startMartianWind();
+      } else {
+        spaceAudio.stopMartianWind();
+      }
     }
-  };
-
-  const scrollToFirstStory = () => {
-    scrollToStory(HARDWARE_REGISTRY[0].id);
-  };
-
-  const jumpToMoonMonuments = () => {
-    const firstMoonMission = HARDWARE_REGISTRY.find((m) => m.celestialBody === 'moon');
-    if (firstMoonMission) {
-      scrollToStory(firstMoonMission.id);
-    }
-  };
-
-  const jumpToMarsMonuments = () => {
-    const firstMarsMission = HARDWARE_REGISTRY.find((m) => m.celestialBody === 'mars');
-    if (firstMarsMission) {
-      scrollToStory(firstMarsMission.id);
-    }
-  };
+  }, [currentEnvironment, isAudioMuted]);
 
   return (
     <div className="relative min-h-screen text-slate-100 font-sans selection:bg-cyan-500 selection:text-black">
-      {/* Dynamic LERP background with particle canvas (Solar System -> Moon -> Mars) */}
-      <BackgroundAtmosphere currentEnvironment={currentEnvironment} />
+      
+      {/* 1. CINEMATIC INITIALIZING LOADER */}
+      {showLoader && (
+        <CinematicLoader onComplete={() => setShowLoader(false)} />
+      )}
 
-      {/* Persistent Navigation Header */}
-      <Navbar
-        badgeCount={unlockedBadges.size}
-        totalBadges={HARDWARE_REGISTRY.length}
-        onOpenDataModal={() => setIsDataModalOpen(true)}
-        onOpenEducatorModal={() => setIsEducatorModalOpen(true)}
-        onScrollToMap={scrollToMap}
-        onScrollToStories={scrollToFirstStory}
+      {/* 2. DYNAMIC 60 FPS LERP GALAXY CANVAS BACKGROUND */}
+      <GalaxyBackground
+        currentEnvironment={currentEnvironment}
+        cameraSpeed={currentView === 'home' ? 1.2 : 0.6}
+        reducedMotion={reducedMotion}
       />
 
-      {/* Main Content Area */}
-      <main className="relative z-10 pt-16 px-4">
+      {/* 3. PERSISTENT RESPONSIVE NAVIGATION HEADER */}
+      <Navbar
+        activeView={currentView}
+        onNavigate={(v) => navigateTo(v)}
+        badgeCount={unlockedBadges.size}
+        totalBadges={HARDWARE_REGISTRY.length}
+        isAudioMuted={isAudioMuted}
+        onToggleAudio={handleToggleAudio}
+        reducedMotion={reducedMotion}
+        onToggleReducedMotion={() => setReducedMotion(!reducedMotion)}
+      />
+
+      {/* 4. MAIN CONTENT ROUTER */}
+      <main className="relative z-10 pt-16">
         
-        {/* INTERACTIVE SOLAR SYSTEM HERO SECTION */}
-        <SolarSystemHero
-          onBeginJourney={scrollToFirstStory}
-          onJumpToMoon={jumpToMoonMonuments}
-          onJumpToMars={jumpToMarsMonuments}
-        />
-
-        {/* REALISTIC PLANETARY MAP SECTION */}
-        <section id="planetary-map-section" className="py-8 scroll-mt-24">
-          <PlanetaryMap
-            selectedMissionId={activeMissionId}
-            onSelectMission={(m) => {
-              setActiveMissionId(m.id);
-              setCurrentEnvironment(m.celestialBody);
+        {/* VIEW: HOME */}
+        {currentView === 'home' && (
+          <HomeHero
+            onExploreStories={() => navigateTo('explore')}
+            onEnterSolarSystem={() => {
+              const el = document.getElementById('solar-system-stage');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
             }}
-            onScrollToStory={scrollToStory}
+            onSelectDestination={(dest) => navigateTo(dest)}
+            onSelectArtifact={(id) => navigateTo('story', id)}
           />
-        </section>
+        )}
 
-        {/* SCROLLYTELLING STORY CHAPTERS */}
-        <section ref={storiesContainerRef} className="py-12">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-xs font-mono uppercase tracking-widest text-cyan-400 block mb-2">
-              INTERACTIVE MISSION LOGS
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-white">
-              Voices in the Extraterrestrial Silence
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2">
-              Scroll down to witness how the background transforms between the stark lunar vacuum and the rust-red Martian dust storm.
-            </p>
-          </div>
+        {/* VIEW: EXPLORE */}
+        {currentView === 'explore' && (
+          <ArtifactExplorer
+            onSelectArtifact={(id) => navigateTo('story', id)}
+          />
+        )}
 
-          {HARDWARE_REGISTRY.map((mission) => (
-            <StorySection
-              key={mission.id}
-              mission={mission}
-              isActive={activeMissionId === mission.id}
-              onUnlockBadge={handleUnlockBadge}
-              isBadgeUnlocked={unlockedBadges.has(mission.id)}
-              onNavigateToMap={scrollToMap}
+        {/* VIEW: MOON */}
+        {currentView === 'moon' && (
+          <MoonDestinationView
+            onSelectArtifact={(id) => navigateTo('story', id)}
+            onBackToSolarSystem={() => navigateTo('home')}
+          />
+        )}
+
+        {/* VIEW: MARS */}
+        {currentView === 'mars' && (
+          <MarsDestinationView
+            onSelectArtifact={(id) => navigateTo('story', id)}
+            onBackToSolarSystem={() => navigateTo('home')}
+          />
+        )}
+
+        {/* VIEW: ARTIFACT STORY */}
+        {currentView === 'story' && (
+          <ArtifactStoryView
+            mission={activeArtifact}
+            onBackToExplorer={() => navigateTo('explore')}
+            onNavigateToMap={(id) => {
+              setSelectedArtifactId(id);
+              navigateTo('map');
+            }}
+            onUnlockBadge={handleUnlockBadge}
+            isBadgeUnlocked={unlockedBadges.has(activeArtifact.id)}
+            onExploreAnother={() => {
+              // Find another mission
+              const currentIndex = HARDWARE_REGISTRY.findIndex((m) => m.id === activeArtifact.id);
+              const nextIndex = (currentIndex + 1) % HARDWARE_REGISTRY.length;
+              navigateTo('story', HARDWARE_REGISTRY[nextIndex].id);
+            }}
+          />
+        )}
+
+        {/* VIEW: TIMELINE */}
+        {currentView === 'timeline' && (
+          <TimelineSection
+            onSelectMission={(id) => navigateTo('story', id)}
+          />
+        )}
+
+        {/* VIEW: MAP */}
+        {currentView === 'map' && (
+          <div className="py-8 px-4">
+            <div className="text-center max-w-2xl mx-auto mb-6">
+              <span className="text-xs font-mono uppercase tracking-widest text-cyan-400 font-bold block mb-1">
+                INTERACTIVE CARTOGRAPHY
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-black text-white">
+                Planetary Orbital Atlas
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 mt-2">
+                Click on any verified landing beacon to inspect coordinates and launch its narrative story.
+              </p>
+            </div>
+
+            <PlanetaryMap
+              selectedMissionId={selectedArtifactId}
+              initialPlanet={activeArtifact.world || activeArtifact.celestialBody}
+              onSelectMission={(m) => setSelectedArtifactId(m.id)}
+              onScrollToStory={(id) => navigateTo('story', id)}
             />
-          ))}
-        </section>
-
-        {/* BADGES REWARD TROPHY BANNER */}
-        <section className="max-w-4xl mx-auto my-16 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-amber-500/40 rounded-3xl p-8 text-center backdrop-blur-xl shadow-2xl">
-          <Award className="w-12 h-12 text-amber-400 mx-auto mb-3 animate-pulse" />
-          <h3 className="text-2xl font-black text-white mb-2">
-            Junior Cosmic Explorer Logbook
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto mb-6">
-            You have unlocked <strong>{unlockedBadges.size} of {HARDWARE_REGISTRY.length}</strong> mission badges by answering the science quizzes.
-          </p>
-
-          <div className="flex justify-center gap-2.5 flex-wrap">
-            {HARDWARE_REGISTRY.map((m) => {
-              const isUnlocked = unlockedBadges.has(m.id);
-              return (
-                <div
-                  key={m.id}
-                  onClick={() => scrollToStory(m.id)}
-                  className={`px-3 py-2 rounded-xl text-xs font-mono border cursor-pointer transition ${
-                    isUnlocked
-                      ? 'bg-amber-500/20 border-amber-400 text-amber-300 font-bold shadow-md shadow-amber-500/20'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-500 hover:text-slate-300'
-                  }`}
-                >
-                  {isUnlocked ? '🏅 ' : '🔒 '}
-                  {m.name.split(' (')[0]}
-                </div>
-              );
-            })}
           </div>
-        </section>
+        )}
+
+        {/* VIEW: SCIENCE */}
+        {currentView === 'science' && (
+          <ScienceSection
+            onNavigateToArtifact={(id) => navigateTo('story', id)}
+          />
+        )}
+
+        {/* VIEW: EDUCATION */}
+        {currentView === 'education' && (
+          <EducationalSection
+            unlockedBadgesCount={unlockedBadges.size}
+            totalBadges={HARDWARE_REGISTRY.length}
+          />
+        )}
+
+        {/* VIEW: SOURCES */}
+        {currentView === 'sources' && (
+          <SourcesSection />
+        )}
 
       </main>
 
-      {/* FOOTER */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-slate-950/90 py-12 px-4 text-center text-xs text-slate-400">
-        <div className="max-w-4xl mx-auto space-y-4">
-          <div className="flex justify-center items-center gap-4 flex-wrap font-mono text-[11px]">
-            <button onClick={() => setIsDataModalOpen(true)} className="hover:text-cyan-400 underline">
-              NASA Open Data Sources
-            </button>
-            <span>•</span>
-            <button onClick={() => setIsEducatorModalOpen(true)} className="hover:text-amber-400 underline">
-              Educator Curriculum Guide
-            </button>
-            <span>•</span>
-            <a href="https://data.nasa.gov" target="_blank" rel="noreferrer" className="hover:text-white flex items-center gap-1">
-              data.nasa.gov <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
+      {/* 5. FOOTER */}
+      <Footer onNavigate={(v) => navigateTo(v)} />
 
-          <p className="text-slate-400 text-[11px] leading-relaxed max-w-xl mx-auto">
-            Built for the NASA Space Apps Challenge 2026. Designed to preserve the legacy of extraterrestrial robotic exploration and introduce youth to planetary science.
-          </p>
-
-          <p className="text-slate-400 text-[10px] font-mono">
-            All orbital basemaps, telemetry, and images are public domain via NASA PDS, USGS Astrogeology, and ESA.
-          </p>
-        </div>
-      </footer>
-
-      {/* Modals */}
-      <NasaDataRegistryModal
-        isOpen={isDataModalOpen}
-        onClose={() => setIsDataModalOpen(false)}
-      />
-
-      <EducatorGuideModal
-        isOpen={isEducatorModalOpen}
-        onClose={() => setIsEducatorModalOpen(false)}
-      />
     </div>
   );
 }

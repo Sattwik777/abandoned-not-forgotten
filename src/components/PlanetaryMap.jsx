@@ -1,28 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Compass, MapPin, Eye, ExternalLink, Filter, Search, Sparkles } from 'lucide-react';
+import { ExternalLink, Search } from 'lucide-react';
 import { HARDWARE_REGISTRY, PLANETARY_GEOLOGY_LABELS } from '../data/hardwareData';
 
 /**
  * Realistic Planetary Atlas (Moon & Mars)
  * Renders authentic NASA photographic orbital basemaps with IAU geological nomenclature
- * and glowing coordinate beacons.
+ * and glowing coordinate beacons for all verified missions.
  */
-export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScrollToStory }) {
-  const [activePlanet, setActivePlanet] = useState('moon'); // 'moon' | 'mars'
-  const [filterType, setFilterType] = useState('all'); // 'all' | 'rover' | 'lander' | 'instrument'
+export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScrollToStory, initialPlanet = 'moon' }) {
+  const [activePlanet, setActivePlanet] = useState(initialPlanet); // 'moon' | 'mars'
+  const [filterType, setFilterType] = useState('all'); // 'all' | 'rover' | 'lander' | 'experiment'
   const [searchQuery, setSearchQuery] = useState('');
   const [hoveredMission, setHoveredMission] = useState(null);
   const canvasRef = useRef(null);
-  const mapImageRef = useRef(null);
+
+  // Synchronize when initialPlanet prop changes
+  const prevInitialPlanetRef = useRef(initialPlanet);
+  useEffect(() => {
+    if (initialPlanet && prevInitialPlanetRef.current !== initialPlanet) {
+      prevInitialPlanetRef.current = initialPlanet;
+      setActivePlanet(initialPlanet);
+    }
+  }, [initialPlanet]);
 
   // Filter hardware by planet & type & search
   const planetMissions = HARDWARE_REGISTRY.filter((m) => {
-    const matchesPlanet = m.celestialBody === activePlanet;
+    const world = m.world || m.celestialBody;
+    const matchesPlanet = world === activePlanet;
     const matchesType = filterType === 'all' || m.type === filterType;
+    const locName = m.location || m.coordinates?.siteName || '';
     const matchesSearch =
       searchQuery === '' ||
       m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.coordinates.siteName.toLowerCase().includes(searchQuery.toLowerCase());
+      locName.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesPlanet && matchesType && matchesSearch;
   });
 
@@ -71,7 +81,7 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
       ctx.strokeStyle = activePlanet === 'moon' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 180, 140, 0.08)';
       ctx.lineWidth = 1;
 
-      // Parallels
+      // Parallels (Latitude)
       for (let lat = -60; lat <= 60; lat += 30) {
         const y = ((90 - lat) / 180) * height;
         ctx.beginPath();
@@ -80,7 +90,7 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
         ctx.stroke();
       }
 
-      // Meridians
+      // Meridians (Longitude)
       for (let lon = -150; lon <= 180; lon += 60) {
         const x = ((lon + 180) / 360) * width;
         ctx.beginPath();
@@ -92,16 +102,16 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
   }, [activePlanet]);
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto my-12 bg-slate-950/95 border border-slate-700/80 rounded-3xl p-4 sm:p-6 backdrop-blur-2xl shadow-2xl overflow-hidden">
+    <div className="relative w-full max-w-6xl mx-auto my-8 bg-slate-950/95 border border-slate-700/80 rounded-3xl p-4 sm:p-6 backdrop-blur-2xl shadow-2xl overflow-hidden">
       
-      {/* Sleek Top HUD Navigation Bar (Matches user reference design) */}
+      {/* Sleek Top HUD Navigation Bar */}
       <div className="flex items-center justify-between flex-wrap gap-4 mb-4 bg-slate-900/90 border border-slate-800 p-3 rounded-2xl">
         
         {/* Planet Switcher Buttons */}
         <div className="flex items-center gap-1.5 bg-black/60 p-1.5 rounded-xl border border-slate-800">
           <button
             onClick={() => setActivePlanet('moon')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
               activePlanet === 'moon'
                 ? 'bg-amber-400 text-slate-950 shadow-md font-black'
                 : 'text-slate-400 hover:text-white'
@@ -112,7 +122,7 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
           </button>
           <button
             onClick={() => setActivePlanet('mars')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
               activePlanet === 'mars'
                 ? 'bg-red-500 text-white shadow-md font-black'
                 : 'text-slate-400 hover:text-white'
@@ -127,10 +137,10 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
         <div className="hidden md:flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
           <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-slate-300">
-            {activePlanet === 'moon' ? 'LUNAR RECONNAISSANCE ATLAS' : 'MARTIAN GLOBAL ORBITAL ATLAS'}
+            {activePlanet === 'moon' ? 'LUNAR RECONNAISSANCE CARTOGRAPHY' : 'MARTIAN GLOBAL ORBITAL CARTOGRAPHY'}
           </h3>
           <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-800">
-            NASA 2026
+            VERIFIED NASA COORDINATES
           </span>
         </div>
 
@@ -141,24 +151,24 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={`Search ${activePlanet === 'moon' ? 'Moon' : 'Mars'}...`}
-            className="w-full pl-9 pr-3 py-1.5 bg-black/70 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+            placeholder={`Search ${activePlanet === 'moon' ? 'Moon' : 'Mars'} sites...`}
+            className="w-full pl-9 pr-3 py-1.5 bg-black/70 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
           />
         </div>
 
         {/* Filter Buttons */}
         <div className="flex items-center gap-1 text-[11px] font-mono">
-          {['all', 'rover', 'lander', 'instrument'].map((type) => (
+          {['all', 'rover', 'lander', 'experiment'].map((type) => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
-              className={`px-2.5 py-1 rounded-lg uppercase tracking-wider transition ${
+              className={`px-2.5 py-1 rounded-lg uppercase tracking-wider transition cursor-pointer ${
                 filterType === type
                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 font-bold'
                   : 'bg-slate-800/40 text-slate-400 hover:text-white'
               }`}
             >
-              {type === 'all' ? 'All Types' : type + 's'}
+              {type === 'all' ? 'All' : type + 's'}
             </button>
           ))}
         </div>
@@ -193,10 +203,12 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
 
         {/* Discarded Hardware Markers */}
         {planetMissions.map((mission) => {
-          const { latitude, longitude } = mission.coordinates;
-          const { leftPct, topPct } = getCoordinatesPct(latitude, longitude);
+          const lat = mission.latitude ?? mission.coordinates?.latitude ?? 0;
+          const lon = mission.longitude ?? mission.coordinates?.longitude ?? 0;
+          const { leftPct, topPct } = getCoordinatesPct(lat, lon);
           const isSelected = selectedMissionId === mission.id;
           const isHovered = hoveredMission?.id === mission.id;
+          const world = mission.world || mission.celestialBody;
 
           return (
             <div
@@ -210,10 +222,10 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
                 if (onScrollToStory) onScrollToStory(mission.id);
               }}
             >
-              {/* Pulsing Emerald/Amber Beacon Ring (Identical to user's reference image!) */}
+              {/* Pulsing Beacon Ring */}
               <div
                 className={`absolute -inset-2 rounded-full animate-ping opacity-60 ${
-                  mission.celestialBody === 'moon' ? 'bg-emerald-400' : 'bg-amber-400'
+                  world === 'moon' ? 'bg-emerald-400' : 'bg-amber-400'
                 }`}
                 style={{ animationDuration: '3s' }}
               />
@@ -253,17 +265,17 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
                 PDS SITE TELEMETRY
               </span>
               <span className="text-[10px] text-slate-400 font-mono">
-                {hoveredMission.coordinates.displayCoords}
+                {hoveredMission.latitude?.toFixed(4)}°, {hoveredMission.longitude?.toFixed(4)}°
               </span>
             </div>
 
             <h4 className="text-sm font-black text-white">{hoveredMission.name}</h4>
             <p className="text-[11px] text-amber-300 font-semibold mb-1">
-              "{hoveredMission.nickname}"
+              {hoveredMission.location}
             </p>
 
             <p className="text-[11px] text-slate-300 line-clamp-2 mb-3">
-              {hoveredMission.story.intro}
+              {hoveredMission.purpose || hoveredMission.story?.intro}
             </p>
 
             <div className="flex items-center justify-between pt-2 border-t border-slate-800">
@@ -272,14 +284,14 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
                   if (onSelectMission) onSelectMission(hoveredMission);
                   if (onScrollToStory) onScrollToStory(hoveredMission.id);
                 }}
-                className="text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow"
+                className="text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow cursor-pointer"
               >
-                <span>Read Mission Story</span>
+                <span>Read Full Story</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </button>
 
               <span className="text-[10px] font-mono text-slate-400">
-                Landed: {hoveredMission.timeline.landed.split(',')[0]}
+                Landed: {hoveredMission.landingDate || hoveredMission.timeline?.landed}
               </span>
             </div>
           </div>
@@ -288,24 +300,27 @@ export default function PlanetaryMap({ onSelectMission, selectedMissionId, onScr
 
       {/* Quick Jump Bar Below Map */}
       <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1">
-        {HARDWARE_REGISTRY.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => {
-              setActivePlanet(m.celestialBody);
-              if (onSelectMission) onSelectMission(m);
-              if (onScrollToStory) onScrollToStory(m.id);
-            }}
-            className={`px-3 py-2 rounded-xl text-left border text-xs whitespace-nowrap transition flex items-center gap-2 ${
-              selectedMissionId === m.id
-                ? 'bg-slate-800 border-cyan-400 text-white'
-                : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>{m.celestialBody === 'moon' ? '🌕' : '🔴'}</span>
-            <span className="font-bold">{m.name.split(' (')[0]}</span>
-          </button>
-        ))}
+        {HARDWARE_REGISTRY.map((m) => {
+          const world = m.world || m.celestialBody;
+          return (
+            <button
+              key={m.id}
+              onClick={() => {
+                setActivePlanet(world);
+                if (onSelectMission) onSelectMission(m);
+                if (onScrollToStory) onScrollToStory(m.id);
+              }}
+              className={`px-3 py-2 rounded-xl text-left border text-xs whitespace-nowrap transition flex items-center gap-2 cursor-pointer ${
+                selectedMissionId === m.id
+                  ? 'bg-slate-800 border-cyan-400 text-white'
+                  : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>{world === 'moon' ? '🌕' : '🔴'}</span>
+              <span className="font-bold">{m.name.split(' (')[0]}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

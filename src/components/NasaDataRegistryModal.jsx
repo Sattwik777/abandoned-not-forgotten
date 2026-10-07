@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, ExternalLink, Database, ShieldCheck, Globe2 } from 'lucide-react';
+import { X, ExternalLink, Database } from 'lucide-react';
 import { NASA_OPEN_DATA_REPOSITORIES, HARDWARE_REGISTRY } from '../data/hardwareData';
 
 /**

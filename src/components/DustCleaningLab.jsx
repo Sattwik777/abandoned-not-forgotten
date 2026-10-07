@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Wind, Sparkles, CheckCircle2 } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Wind, CheckCircle2 } from 'lucide-react';
 
 /**
  * DustCleaningLab
@@ -12,18 +12,7 @@ export default function DustCleaningLab({ missionName = "Opportunity" }) {
   const [isFullyCleaned, setIsFullyCleaned] = useState(false);
   const isDrawing = useRef(false);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const width = (canvas.width = 380);
-    const height = (canvas.height = 180);
-
-    // Draw dusty layer
-    drawDustLayer(ctx, width, height);
-  }, []);
-
-  const drawDustLayer = (ctx, width, height) => {
+  const drawDustLayer = useCallback((ctx, width, height) => {
     ctx.fillStyle = '#b8512e';
     ctx.fillRect(0, 0, width, height);
 
@@ -37,7 +26,18 @@ export default function DustCleaningLab({ missionName = "Opportunity" }) {
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = (canvas.width = 380);
+    const height = (canvas.height = 180);
+
+    // Draw dusty layer
+    drawDustLayer(ctx, width, height);
+  }, [drawDustLayer]);
 
   const cleanAtPoint = (x, y) => {
     const canvas = canvasRef.current;

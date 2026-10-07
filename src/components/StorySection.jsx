@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { 
-  Volume2, VolumeX, Sparkles, Database, Compass, 
+  Volume2, VolumeX, Sparkles, Database, 
   Award, CheckCircle2, XCircle, Wrench, BookOpen, 
-  MapPin, Clock, ShieldCheck, HelpCircle
+  MapPin, ShieldCheck, HelpCircle
 } from 'lucide-react';
 import DustCleaningLab from './DustCleaningLab';
 import LaserBounceLab from './LaserBounceLab';

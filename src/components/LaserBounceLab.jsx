@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, Target, Sparkles, Award } from 'lucide-react';
+import { Zap, Award } from 'lucide-react';
 
 /**
  * LaserBounceLab
