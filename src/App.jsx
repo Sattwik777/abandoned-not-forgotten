@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import BackgroundAtmosphere from './components/BackgroundAtmosphere';
+import SolarSystemHero from './components/SolarSystemHero';
 import PlanetaryMap from './components/PlanetaryMap';
 import StorySection from './components/StorySection';
 import NasaDataRegistryModal from './components/NasaDataRegistryModal';
 import EducatorGuideModal from './components/EducatorGuideModal';
 import { HARDWARE_REGISTRY } from './data/hardwareData';
-import { ChevronDown, Compass, Rocket, Sparkles, Award, Database, ExternalLink } from 'lucide-react';
+import { Award, ExternalLink } from 'lucide-react';
 
 export default function App() {
   const [activeMissionId, setActiveMissionId] = useState(HARDWARE_REGISTRY[0].id);
+  const [isInHeroView, setIsInHeroView] = useState(true);
   const [unlockedBadges, setUnlockedBadges] = useState(new Set());
   const [isDataModalOpen, setIsDataModalOpen] = useState(false);
   const [isEducatorModalOpen, setIsEducatorModalOpen] = useState(false);
@@ -17,8 +19,19 @@ export default function App() {
 
   const activeMission = HARDWARE_REGISTRY.find((m) => m.id === activeMissionId) || HARDWARE_REGISTRY[0];
 
-  // IntersectionObserver to detect which story is centered in viewport and trigger background change
+  // IntersectionObserver to detect whether in hero view or which story is centered in viewport
   useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      if (scrollY < 380) {
+        setIsInHeroView(true);
+      } else {
+        setIsInHeroView(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -31,7 +44,7 @@ export default function App() {
         });
       },
       {
-        rootMargin: '-30% 0px -30% 0px', // triggers when card is near screen center
+        rootMargin: '-30% 0px -30% 0px',
         threshold: 0.2
       }
     );
@@ -40,6 +53,7 @@ export default function App() {
     cards.forEach((card) => observer.observe(card));
 
     return () => {
+      window.removeEventListener('scroll', handleScroll);
       cards.forEach((card) => observer.unobserve(card));
     };
   }, []);
@@ -66,10 +80,24 @@ export default function App() {
     scrollToStory(HARDWARE_REGISTRY[0].id);
   };
 
+  const jumpToMoonMonuments = () => {
+    const firstMoonMission = HARDWARE_REGISTRY.find((m) => m.celestialBody === 'moon');
+    if (firstMoonMission) {
+      scrollToStory(firstMoonMission.id);
+    }
+  };
+
+  const jumpToMarsMonuments = () => {
+    const firstMarsMission = HARDWARE_REGISTRY.find((m) => m.celestialBody === 'mars');
+    if (firstMarsMission) {
+      scrollToStory(firstMarsMission.id);
+    }
+  };
+
   return (
     <div className="relative min-h-screen text-slate-100 font-sans selection:bg-cyan-500 selection:text-black">
-      {/* Dynamic LERP background with particle canvas */}
-      <BackgroundAtmosphere activeMission={activeMission} />
+      {/* Dynamic LERP background with particle canvas (Solar System -> Moon -> Mars) */}
+      <BackgroundAtmosphere activeMission={activeMission} isInHeroView={isInHeroView} />
 
       {/* Persistent Navigation Header */}
       <Navbar
@@ -82,54 +110,16 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="relative z-10 pt-20 px-4">
+      <main className="relative z-10 pt-16 px-4">
         
-        {/* HERO SECTION */}
-        <section className="min-h-[85vh] flex flex-col items-center justify-center text-center max-w-4xl mx-auto py-12">
-          
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/80 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold uppercase tracking-wider mb-6 backdrop-blur-md shadow-lg">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>NASA Space Apps Challenge 2026</span>
-          </div>
+        {/* INTERACTIVE SOLAR SYSTEM HERO SECTION */}
+        <SolarSystemHero
+          onBeginJourney={scrollToFirstStory}
+          onJumpToMoon={jumpToMoonMonuments}
+          onJumpToMars={jumpToMarsMonuments}
+        />
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white mb-6 leading-tight">
-            Abandoned but <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-orange-300 to-cyan-400">
-              Not Forgotten
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto mb-8 leading-relaxed font-normal">
-            Across the desolate dust of the Moon and Mars rest dozens of silent machines. 
-            They aren't space debris—they are <strong>humanity's first extraterrestrial monuments</strong>. 
-            Step into their memory banks and discover the groundbreaking science they left behind.
-          </p>
-
-          <div className="flex items-center justify-center gap-3 flex-wrap">
-            <button
-              onClick={scrollToFirstStory}
-              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-sm flex items-center gap-2 shadow-xl shadow-amber-500/20 transition transform hover:-translate-y-0.5"
-            >
-              <Rocket className="w-4 h-4" />
-              <span>Begin the Cosmic Journey</span>
-            </button>
-
-            <button
-              onClick={scrollToMap}
-              className="px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-cyan-300 border border-slate-700 font-bold text-sm flex items-center gap-2 backdrop-blur shadow-lg transition"
-            >
-              <Compass className="w-4 h-4" />
-              <span>Explore Planetary Map</span>
-            </button>
-          </div>
-
-          <div className="mt-16 flex flex-col items-center text-slate-400 text-xs font-mono animate-bounce cursor-pointer" onClick={scrollToFirstStory}>
-            <span>Scroll down to meet the rovers</span>
-            <ChevronDown className="w-5 h-5 text-amber-400 mt-1" />
-          </div>
-        </section>
-
-        {/* INTERACTIVE PLANETARY MAP SECTION */}
+        {/* REALISTIC PLANETARY MAP SECTION */}
         <section id="planetary-map-section" className="py-8 scroll-mt-24">
           <PlanetaryMap
             selectedMissionId={activeMissionId}
@@ -145,10 +135,10 @@ export default function App() {
               INTERACTIVE MISSION LOGS
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-white">
-              Voices in the Solar Silence
+              Voices in the Extraterrestrial Silence
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 mt-2">
-              As you scroll down from story to story, notice the planetary atmosphere change around you!
+              Scroll down from mission to mission to experience the real physics, hardware, and changing planetary atmospheres.
             </p>
           </div>
 
@@ -174,7 +164,7 @@ export default function App() {
             You have unlocked <strong>{unlockedBadges.size} of {HARDWARE_REGISTRY.length}</strong> mission badges by answering the science quizzes.
           </p>
 
-          <div className="flex justify-center gap-3 flex-wrap">
+          <div className="flex justify-center gap-2.5 flex-wrap">
             {HARDWARE_REGISTRY.map((m) => {
               const isUnlocked = unlockedBadges.has(m.id);
               return (
@@ -215,7 +205,7 @@ export default function App() {
           </div>
 
           <p className="text-slate-400 text-[11px] leading-relaxed max-w-xl mx-auto">
-            Built for the NASA Space Apps Challenge. Designed to preserve the legacy of extraterrestrial robotic exploration and inspire youth to reach for the stars.
+            Built for the NASA Space Apps Challenge 2026. Designed to preserve the legacy of extraterrestrial robotic exploration and introduce youth to planetary science.
           </p>
 
           <p className="text-slate-400 text-[10px] font-mono">

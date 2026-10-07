@@ -1,43 +1,64 @@
 /**
- * NASA Discarded Hardware & Monument Registry
- * Data derived from:
+ * NASA & International Extraterrestrial Hardware Registry
+ * Powered by:
  * - NASA Open Data Portal (data.nasa.gov)
  * - NASA Planetary Data System (PDS)
- * - NASA JPL Mission Archives & NSSDC Master Catalog
- * - USGS Astrogeology Science Center
+ * - NASA JPL Solar System Treks (Moon Trek & Mars Trek)
+ * - USGS Astrogeology Planetary Nomenclature
  * - ESA Planetary Science Archive
  */
+
+export const PLANETARY_GEOLOGY_LABELS = {
+  moon: [
+    { name: "MARE IMBRIUM", lat: 34, lon: -15, type: "mare" },
+    { name: "Oceanus Procellarum", lat: 20, lon: -56, type: "oceanus" },
+    { name: "MARE SERENITATIS", lat: 27, lon: 18, type: "mare" },
+    { name: "MARE TRANQUILLITATIS", lat: 8, lon: 31, type: "mare" },
+    { name: "MARE CRISIUM", lat: 17, lon: 59, type: "mare" },
+    { name: "MARE FECUNDITATIS", lat: -4, lon: 52, type: "mare" },
+    { name: "MARE NECTARIS", lat: -15, lon: 35, type: "mare" },
+    { name: "MARE NUBIUM", lat: -21, lon: -16, type: "mare" },
+    { name: "Montes Apenninus", lat: 20, lon: -2, type: "montes" },
+    { name: "Tycho Crater", lat: -43, lon: -11, type: "crater" },
+    { name: "Copernicus Crater", lat: 9, lon: -20, type: "crater" },
+  ],
+  mars: [
+    { name: "Olympus Mons", lat: 18.6, lon: -133.8, type: "volcano" },
+    { name: "Valles Marineris", lat: -14, lon: -59, type: "canyon" },
+    { name: "Elysium Planitia", lat: 3, lon: 154, type: "planitia" },
+    { name: "Meridiani Planum", lat: 0, lon: -3, type: "planum" },
+    { name: "Gusev Crater", lat: -14.5, lon: 175.4, type: "crater" },
+    { name: "Gale Crater", lat: -5.4, lon: 137.8, type: "crater" },
+    { name: "Jezero Crater", lat: 18.4, lon: 77.5, type: "crater" },
+    { name: "Acidalia Planitia", lat: 46, lon: -21, type: "planitia" },
+    { name: "Hellas Planitia", lat: -42, lon: 70, type: "basin" },
+    { name: "Syrtis Major", lat: 8, lon: 69, type: "plateau" },
+  ]
+};
 
 export const HARDWARE_REGISTRY = [
   {
     id: "opportunity",
     name: "Opportunity (MER-B)",
-    nickname: "Oppy: The 15-Year Marathon Runner",
+    nickname: "Oppy: The 15-Year Martian Marathon Runner",
     celestialBody: "mars",
     type: "rover",
     coordinates: {
       latitude: -1.9462,
-      longitude: 354.4734,
-      displayCoords: "1.9462° S, 354.4734° E",
+      longitude: -5.5266,
+      displayCoords: "1.9462° S, 5.5266° W",
       siteName: "Perseverance Valley, Endeavour Crater, Meridiani Planum"
     },
     timeline: {
       launched: "July 7, 2003",
       landed: "January 25, 2004",
       lastContact: "June 10, 2018 (Sol 5,111)",
-      missionDuration: "14 years, 136 days (Designed for 90 days!)",
+      missionDuration: "14 years, 136 days (Designed for only 90 days!)",
       distanceTraveled: "45.16 km (28.06 miles) — Solar System Marathon Record"
     },
     status: "Silenced by a planet-encircling Martian dust storm",
     currentCondition: "Stationed on the upper slopes of Perseverance Valley, blanketed in fine reddish iron-oxide dust under the thin Martian sky.",
-    atmosphericTheme: {
-      gradient: "radial-gradient(ellipse at 50% 20%, #4a1c11 0%, #200b08 45%, #0d0403 100%)",
-      particleColor: "rgba(224, 102, 60, 0.65)",
-      particleType: "dust",
-      glowColor: "rgba(255, 107, 74, 0.25)"
-    },
     story: {
-      audioGreeting: "opportunity_wind.mp3",
       heroQuote: "My battery is low and it's getting dark.",
       intro: "Hi, Earth friends! I'm Opportunity, though the engineers at NASA called me Oppy. I was built as a twin alongside my sister Spirit. NASA designed me to survive just 90 Martian days (sols). They wondered if I could even drive 1 kilometer. Little did they know, I would stay awake for almost 15 Earth years, rolling over 45 kilometers across the red desert!",
       chapters: [
@@ -123,6 +144,105 @@ export const HARDWARE_REGISTRY = [
       }
     ]
   },
+
+  {
+    id: "spirit-rover",
+    name: "Spirit (MER-A)",
+    nickname: "Oppy's Courageous Twin: Conqueror of Husband Hill",
+    celestialBody: "mars",
+    type: "rover",
+    coordinates: {
+      latitude: -14.5684,
+      longitude: 175.4726,
+      displayCoords: "14.5684° S, 175.4726° E",
+      siteName: "Home Plate, Columbia Hills, Gusev Crater"
+    },
+    timeline: {
+      launched: "June 10, 2003",
+      landed: "January 4, 2004",
+      lastContact: "March 22, 2010 (Sol 2,210)",
+      missionDuration: "6 years, 77 days (Designed for 90 days)",
+      distanceTraveled: "7.73 km (4.80 miles)"
+    },
+    status: "Entrenched in sulfate sand at 'Troy'; frozen during Martian winter",
+    currentCondition: "Stationed beside Home Plate in Gusev Crater, resting at a tilted angle pointing towards the southern sky.",
+    story: {
+      heroQuote: "My broken wheel turned out to be my greatest scientific tool.",
+      intro: "I am Spirit, Opportunity's twin sister. While Oppy landed in a smooth plain with blueberries, I landed on the rough, volcanic floor of Gusev Crater. I faced mechanical heartaches, yet I ended up discovering ancient volcanic hydrothermal vents that might once have sheltered alien microbes!",
+      chapters: [
+        {
+          title: "1. The Mountain Climber of Columbia Hills",
+          content: "NASA engineers weren't sure if a rover could climb a mountain on Mars. But I scaled Husband Hill—climbing over 100 vertical meters up steep 30-degree slopes! From the peak, I took a glorious 360-degree panorama of the vast crater floor below."
+        },
+        {
+          title: "2. The Broken Wheel that Made History",
+          content: "In 2006, my right-front wheel motor died and locked up completely. My engineers had to drive me backwards, dragging my dead wheel like an anchor through the dirt. But as the dead wheel dug a trench behind me, it churned up brilliant white soil: 90% pure silica! That silica could only have formed in one way: hot water springs or volcanic fumaroles! My broken wheel made one of the greatest astrobiology discoveries in NASA history!"
+        },
+        {
+          title: "3. The Sand Trap of 'Troy'",
+          content: "In May 2009, my wheels broke through a crusty layer of soil into a hidden sand trap of soft iron sulfates nicknamed 'Troy.' Engineers worked for months in a sandbox simulator in California trying to steer me out, but my underbelly rested on a hidden rock."
+        },
+        {
+          title: "4. The Stationary Station & The Cold Sol",
+          content: "Because I couldn't drive, I couldn't tilt my solar panels towards the winter sun. As winter temperatures plummeted to -100°C, my heaters couldn't keep my electronics warm. On March 22, 2010, I went into hibernation and slipped into eternal sleep."
+        },
+        {
+          title: "5. My Sacred Ground at Home Plate",
+          content: "I proved that even when machines break down, curiosity and human perseverance can turn setbacks into immortal scientific triumphs."
+        }
+      ]
+    },
+    hardwareAnatomy: [
+      {
+        part: "Stuck Right-Front Wheel",
+        description: "Locked wheel that was dragged backwards for 4 years, unintentionally acting as a 10-cm geologic trenching plow."
+      },
+      {
+        part: "Miniature Thermal Emission Spectrometer (Mini-TES)",
+        description: "Infrared mineral sensor that measured thermal infrared radiation from rocks on Husband Hill."
+      },
+      {
+        part: "Gallium Arsenide Solar Array",
+        description: "Supplied 140 watts at landing, but gradually attenuated to under 130 Wh per sol during the harsh winter solstices."
+      },
+      {
+        part: "Pancam Mast Assembly",
+        description: "Captured the famous 'Spirit at the Summit' panorama across Gusev Crater."
+      }
+    ],
+    scienceHighlights: [
+      "Discovered 90% pure silica deposits at Home Plate, proving ancient hydrothermal hot springs existed on Mars.",
+      "First rover to scale an extraterrestrial mountain (Husband Hill, 107 meters high).",
+      "Recorded hundreds of active dust devils passing over Gusev Crater on video.",
+      "Found carbonate minerals in the Comanche outcrop indicating non-acidic ancient waters."
+    ],
+    quiz: {
+      question: "How did Spirit discover 90% pure silica hot spring deposits on Mars?",
+      options: [
+        "Its broken front wheel dragged through the soil and dug a trench",
+        "It fired a high-powered drill laser",
+        "A meteorite fell next to the rover",
+        "It flew over the crater with a drone"
+      ],
+      correctIndex: 0,
+      explanation: "Correct! Spirit's right-front wheel seized up, and dragging it backwards carved open the white silica deposits!"
+    },
+    nasaDataSources: [
+      {
+        name: "NASA PDS Mars Exploration Rover Spirit Archive",
+        datasetId: "PDS-MER-SPIRIT-EDR-V1.0",
+        url: "https://data.nasa.gov/dataset/Mars-Exploration-Rover-Spirit-Data/pds-mer1",
+        description: "Complete Gusev Crater traverse track coordinates and Mini-TES thermal emission spectra."
+      },
+      {
+        name: "NASA Jet Propulsion Laboratory: Spirit Sol-by-Sol Log",
+        datasetId: "JPL-MER-A-LOG",
+        url: "https://mars.nasa.gov/mer/mission/status_spirit.html",
+        description: "Daily engineering telemetry, wheel amp logs, and solar array dust factor records."
+      }
+    ]
+  },
+
   {
     id: "apollo15-lrv",
     name: "Apollo 15 Lunar Roving Vehicle (LRV-001)",
@@ -144,15 +264,9 @@ export const HARDWARE_REGISTRY = [
     },
     status: "Parked facing Lunar Module Falcon; intact in the lunar vacuum",
     currentCondition: "Pristine condition. Because the Moon has no wind, rain, or atmosphere, its tire tracks and chassis look virtually identical to the moment astronaut Dave Scott stepped out 50+ years ago.",
-    atmosphericTheme: {
-      gradient: "radial-gradient(ellipse at 50% 20%, #262930 0%, #111317 45%, #050608 100%)",
-      particleColor: "rgba(220, 230, 245, 0.45)",
-      particleType: "lunar_regolith",
-      glowColor: "rgba(180, 205, 240, 0.2)"
-    },
     story: {
       heroQuote: "Man's greatest drive across the silver plains.",
-      intro: "Vroom! Or rather, *complete silence*—because sound cannot travel in a vacuum! I was the very first vehicle humanity ever drove on another world. Astronauts David Scott and Jim Irwin unfolded me like an origami transformer from the side of the Apollo 15 Lunar Module 'Falcon.'",
+      intro: "Vroom! Or rather, complete silence—because sound cannot travel in a vacuum! I was the very first vehicle humanity ever drove on another world. Astronauts David Scott and Jim Irwin unfolded me like an origami transformer from the side of the Apollo 15 Lunar Module Falcon.",
       chapters: [
         {
           title: "1. The Origami Space Car",
@@ -236,6 +350,105 @@ export const HARDWARE_REGISTRY = [
       }
     ]
   },
+
+  {
+    id: "surveyor3-apollo12",
+    name: "Surveyor 3 & Apollo 12 Rendezvous",
+    nickname: "The Robot Visited by Humans on Another World",
+    celestialBody: "moon",
+    type: "lander",
+    coordinates: {
+      latitude: -3.0124,
+      longitude: -23.4216,
+      displayCoords: "3.0124° S, 23.4216° W",
+      siteName: "Surveyor Crater, Oceanus Procellarum"
+    },
+    timeline: {
+      launched: "April 17, 1967",
+      landed: "April 20, 1967",
+      lastContact: "May 4, 1967 (Visited by Apollo 12: Nov 19, 1969)",
+      missionDuration: "Lander operated 14 days; visited 2.5 years later!",
+      distanceTraveled: "0 km (Stationary Lander)"
+    },
+    status: "Intact on crater slope; camera retrieved and currently in Smithsonian",
+    currentCondition: "Resting inside Surveyor Crater. Astronauts cut off its TV camera and mechanical scoop, leaving the tripod frame as an eternal historic archaeological site.",
+    story: {
+      heroQuote: "Human beings walked up to an abandoned robot on another world.",
+      intro: "I am Surveyor 3. I landed on the Moon in April 1967 as a lonely robotic scout. But two and a half years later, something happened that has NEVER happened to any other machine in the history of the universe: human astronauts walked across the Moon and paid me a visit in person!",
+      chapters: [
+        {
+          title: "1. The Bouncing Robot Scout",
+          content: "Before Apollo astronauts could land, NASA needed to know if lunar dust was solid or if spaceships would sink like quicksand. I proved the soil was firm by digging trenches with my miniature robotic claw and taking 6,315 television pictures."
+        },
+        {
+          title: "2. The Pinpoint Landing of Apollo 12",
+          content: "On November 19, 1969, Apollo 12 astronauts Pete Conrad and Alan Bean executed the most miraculous precision landing in spaceflight history. They landed their Lunar Module 'Intrepid' just 160 meters (530 feet) from where I was parked on the slope of Surveyor Crater!"
+        },
+        {
+          title: "3. The Handshake with Humanity",
+          content: "Can you imagine the feeling? Conrad and Bean walked down into the crater, took photos beside me, and used bolt-cutters to snip off my TV camera, mechanical soil scoop, and metal tubing to take back to Earth."
+        },
+        {
+          title: "4. The Greatest Space Archaeology Experiment",
+          content: "When scientists back on Earth examined my parts in cleanrooms, they were able to measure how cosmic radiation, micrometeorite strikes, and extreme solar baking affect human machinery over years in space. My retrieved camera is on display in the Smithsonian Air and Space Museum today!"
+        },
+        {
+          title: "5. The Guardian of the Ocean of Storms",
+          content: "My remaining golden frame and landing pads still stand on that crater slope in Oceanus Procellarum—the solar system's first joint robotic and human heritage monument."
+        }
+      ]
+    },
+    hardwareAnatomy: [
+      {
+        part: "Surveyor TV Camera (Retrieved by Apollo 12)",
+        description: "Rotating mirror vidicon camera that beamed 6,315 analog photos to Earth; returned to Earth by astronauts in 1969."
+      },
+      {
+        part: "Surface Sampler Soil Scoop",
+        description: "Electric scissor-arm scoop used to dig trenches up to 17.5 cm deep to test lunar load-bearing capacity."
+      },
+      {
+        part: "Tubular Aluminum Tripod Legs",
+        description: "Three crushable honeycomb aluminum pads that absorbed landing velocity on the 12-degree crater slope."
+      },
+      {
+        part: "Solar Array & Planar Antenna",
+        description: "Rotatable panel that generated 89 watts of solar electricity during the lunar daytime."
+      }
+    ],
+    scienceHighlights: [
+      "First successful human-robotic rendezvous on another extraterrestrial body.",
+      "Proved lunar regolith could support the weight of heavy crewed landing modules.",
+      "Provided foundational material science data on how aluminum and glass degrade in interplanetary vacuum.",
+      "Demonstrated pinpoint lunar navigational targeting to within 160 meters."
+    ],
+    quiz: {
+      question: "Which Apollo mission landed next to Surveyor 3 and retrieved its camera?",
+      options: [
+        "Apollo 12",
+        "Apollo 11",
+        "Apollo 13",
+        "Apollo 17"
+      ],
+      correctIndex: 0,
+      explanation: "Correct! Apollo 12 astronauts Pete Conrad and Alan Bean landed within 160 meters of Surveyor 3 in November 1969!"
+    },
+    nasaDataSources: [
+      {
+        name: "NASA data.nasa.gov: Surveyor 3 Analysis Report",
+        datasetId: "NASA-SP-284-SURVEYOR3",
+        url: "https://data.nasa.gov/dataset/Analysis-of-Surveyor-3-Samples-Returned-by-Apollo-12/pds-surv3",
+        description: "Comprehensive scientific examination of parts brought back to Earth from the lunar surface."
+      },
+      {
+        name: "NASA Apollo Lunar Surface Journal: Apollo 12 at Surveyor Crater",
+        datasetId: "ALSJ-AP12-SURVEYOR",
+        url: "https://www.nasa.gov/history/alsj/a12/a12.surveyor.html",
+        description: "Astronaut audio transcripts and Hasselblad 70mm photographs of the rendezvous."
+      }
+    ]
+  },
+
   {
     id: "insight-lander",
     name: "InSight Lander",
@@ -257,12 +470,6 @@ export const HARDWARE_REGISTRY = [
     },
     status: "Solar panels blanketed in thick red dust; powered down gracefully",
     currentCondition: "Stationed quietly on the flat plains of Elysium Planitia, its two 7-foot circular solar arrays caked in atmospheric dust, instruments resting on the soil beside it.",
-    atmosphericTheme: {
-      gradient: "radial-gradient(ellipse at 50% 20%, #44201a 0%, #1f0f0c 45%, #080302 100%)",
-      particleColor: "rgba(235, 120, 80, 0.6)",
-      particleType: "dust",
-      glowColor: "rgba(240, 110, 60, 0.2)"
-    },
     story: {
       heroQuote: "My time here has been both productive and serene.",
       intro: "While rovers love to drive and climb over rocks, I had a very different mission: I came to Mars to sit completely still, hold my breath, and listen to the pulse of the planet's interior deep beneath the crust.",
@@ -349,6 +556,7 @@ export const HARDWARE_REGISTRY = [
       }
     ]
   },
+
   {
     id: "apollo11-lrrr",
     name: "Apollo 11 Retroreflector (LRRR)",
@@ -370,12 +578,6 @@ export const HARDWARE_REGISTRY = [
     },
     status: "100% Operational! Passively reflecting Earth lasers today",
     currentCondition: "Sitting calmly in the Sea of Tranquility, its 100 quartz prisms still pointing back at Earth, glistening under the direct glare of the Sun and the lunar night.",
-    atmosphericTheme: {
-      gradient: "radial-gradient(ellipse at 50% 20%, #1e232e 0%, #0d1017 45%, #030406 100%)",
-      particleColor: "rgba(180, 220, 255, 0.5)",
-      particleType: "stars",
-      glowColor: "rgba(100, 180, 255, 0.3)"
-    },
     story: {
       heroQuote: "No batteries. No wires. Just pure light reflecting across 384,400 kilometers.",
       intro: "I am probably the most magical machine on this list because I have no wires, no battery, and no computer chip. Yet while every other Apollo instrument ran out of power decades ago, I am still actively working right now!",
@@ -458,6 +660,105 @@ export const HARDWARE_REGISTRY = [
       }
     ]
   },
+
+  {
+    id: "viking1-lander",
+    name: "Viking 1 Lander",
+    nickname: "Humanity's First Long-Lived Martian Outpost (1976)",
+    celestialBody: "mars",
+    type: "lander",
+    coordinates: {
+      latitude: 22.697,
+      longitude: -48.222,
+      displayCoords: "22.697° N, 48.222° W",
+      siteName: "Chryse Planitia ('The Plains of Gold')"
+    },
+    timeline: {
+      launched: "August 20, 1975",
+      landed: "July 20, 1976",
+      lastContact: "November 11, 1982 (Sol 2,245)",
+      missionDuration: "6 years, 116 days (2,245 Sols)",
+      distanceTraveled: "0 km (Stationary Base Station)"
+    },
+    status: "Silenced in 1982; officially renamed the Thomas Mutch Memorial Station",
+    currentCondition: "Intact on the rolling rocky plain of Chryse Planitia, resting on three inverted tripod landing legs beside rocks named 'Big Joe'.",
+    story: {
+      heroQuote: "Humanity's first color photograph from the surface of another planet.",
+      intro: "In 1976—the bicentennial year of the United States—I became the very first American spacecraft to touch down safely on Mars and stay awake for years. Before me, humanity had never seen a color picture of the Martian surface!",
+      chapters: [
+        {
+          title: "1. The First Footstep on the Red Sand",
+          content: "On July 20, 1976 (exactly seven years to the day after Apollo 11 landed on the Moon!), I touched down in Chryse Planitia. Minutes later, my scanner camera began slowly capturing line by line of telemetry. When the image built on computer screens in Pasadena, engineers gasped: the rocks were iron-red, and the sky was butterscotch pink!"
+        },
+        {
+          title: "2. The Search for Alien Life",
+          content: "I carried miniature biological laboratories packed with radioactive nutrients to test if Martian microbes lived in the dirt. When nutrients were added to the soil, carbon gas bubbled up! Scientists were thrilled, but later determined it was exotic soil chemistry (perchlorates) rather than living bacteria."
+        },
+        {
+          title: "3. Nuclear Power in the Cold",
+          content: "Unlike later solar landers that died in dust storms, I was powered by Radioisotope Thermoelectric Generators (RTGs) utilizing decaying plutonium heat. I operated through six long Martian years, beaming daily weather forecasts back to Earth!"
+        },
+        {
+          title: "4. The Accidental Command",
+          content: "In November 1982, ground controllers sent a software patch to upgrade battery charging routines. An unintended command address accidentally overwrote the high-gain antenna pointing tables. My dish pointed away from Earth, and my transmission was lost forever."
+        },
+        {
+          title: "5. The Mutch Memorial Station",
+          content: "In 1984, NASA officially renamed me the Thomas A. Mutch Memorial Station in honor of the Viking imaging team leader. I stand today as the pioneer that introduced humanity to the reality of the Martian landscape."
+        }
+      ]
+    },
+    hardwareAnatomy: [
+      {
+        part: "Twin SNAP-19 RTG Generators",
+        description: "Plutonium-238 radioisotope thermoelectric generators generating 70 watts of electricity and heat for 6+ years."
+      },
+      {
+        part: "Surface Sampler Collector Arm",
+        description: "3-meter telescoping boom with a backhoe collector head that scooped soil samples into biological test chambers."
+      },
+      {
+        part: "Facsimile Scanner Cameras",
+        description: "Dual nodding-mirror optical cameras that imaged 360-degree panoramas and the first color views of Mars."
+      },
+      {
+        part: "Meteorology Boom Sensor",
+        description: "Wind speed, wind direction, and temperature sensors that provided daily Martian weather reports."
+      }
+    ],
+    scienceHighlights: [
+      "Captured the first-ever color photographs and weather logs from the surface of Mars.",
+      "Conducted the first in-situ search for organic biology and carbon chemistry on Mars.",
+      "Characterized Martian atmospheric composition: 95.3% CO₂, 2.7% N₂, 1.6% Ar.",
+      "Discovered that Martian soil is chemically hyperactive with oxidants."
+    ],
+    quiz: {
+      question: "What power source allowed Viking 1 to survive on Mars for over 6 years without solar panels?",
+      options: [
+        "Radioisotope Thermoelectric Generators (Nuclear RTGs)",
+        "Rechargeable AA batteries",
+        "Wind turbines",
+        "Geothermal heat drill"
+      ],
+      correctIndex: 0,
+      explanation: "Correct! Viking 1 was powered by twin SNAP-19 RTGs using decaying plutonium heat, so dust storms couldn't stop it!"
+    },
+    nasaDataSources: [
+      {
+        name: "NASA data.nasa.gov: Viking 1 Landing Site Rock Populations",
+        datasetId: "NASA-PDS-VL1-ROCKS",
+        url: "https://data.nasa.gov/dataset/VL1-VL2-Mars-Landing-Site-Rock-Populations-V1-0/pds-vl1",
+        description: "Catalog of 1,200+ rocks mapped at the Chryse Planitia landing site."
+      },
+      {
+        name: "NASA PDS Mars Viking Meteorology Archive",
+        datasetId: "PDS-V-MET-EDR-V1.0",
+        url: "https://data.nasa.gov/dataset/Viking-1-Meteorology-Data/pds-vmet",
+        description: "Daily atmospheric pressure, wind velocity, and ambient temperature records (1976-1982)."
+      }
+    ]
+  },
+
   {
     id: "sojourner",
     name: "Sojourner (Mars Pathfinder)",
@@ -466,7 +767,7 @@ export const HARDWARE_REGISTRY = [
     type: "rover",
     coordinates: {
       latitude: 19.13,
-      longitude: 326.78,
+      longitude: -33.22,
       displayCoords: "19.13° N, 33.22° W",
       siteName: "Ares Vallis (The Valley of War)"
     },
@@ -479,12 +780,6 @@ export const HARDWARE_REGISTRY = [
     },
     status: "Silent on the ancient floodplains beside the Carl Sagan Memorial Station",
     currentCondition: "Resting beside its ramp and lander in Ares Vallis, surrounded by rocks named Barnacle Bill, Yogi, and Casper.",
-    atmosphericTheme: {
-      gradient: "radial-gradient(ellipse at 50% 20%, #4a2916 0%, #24130a 45%, #0a0502 100%)",
-      particleColor: "rgba(240, 140, 80, 0.55)",
-      particleType: "dust",
-      glowColor: "rgba(240, 120, 50, 0.2)"
-    },
     story: {
       heroQuote: "Small in size, titan in courage.",
       intro: "Before me, no wheeled vehicle had ever rolled across another planet. Many critics said a rover on Mars was impossible—that wheels would slip in the sand, computers would freeze, and we would get lost. I proved them all wrong!",
@@ -579,7 +874,7 @@ export const NASA_OPEN_DATA_REPOSITORIES = [
   {
     agency: "NASA Planetary Data System (PDS)",
     category: "Scientific Telemetry & Archives",
-    description: "Peer-reviewed scientific archives of all NASA planetary missions (InSight SEIS, MER APXS, Mars Pathfinder).",
+    description: "Peer-reviewed scientific archives of all NASA planetary missions (InSight SEIS, MER APXS, Mars Pathfinder, Viking).",
     url: "https://pds.jpl.nasa.gov"
   },
   {
