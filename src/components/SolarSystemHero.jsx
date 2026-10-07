@@ -10,7 +10,7 @@ export default function SolarSystemHero({ onJumpToMoon, onJumpToMars, onBeginJou
   const [hoveredPlanet, setHoveredPlanet] = useState(null);
 
   return (
-    <section className="relative min-h-[92vh] flex flex-col items-center justify-center text-center max-w-5xl mx-auto py-12 px-4 select-none">
+    <section id="solar-system-hero" className="relative min-h-[92vh] flex flex-col items-center justify-center text-center max-w-5xl mx-auto py-12 px-4 select-none">
 
       <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white mb-4 leading-tight">
         Abandoned but <br />

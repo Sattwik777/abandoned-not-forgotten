@@ -2,123 +2,67 @@ import React, { useEffect, useRef } from 'react';
 
 /**
  * BackgroundAtmosphere
- * Canvas engine that creates smooth, cinematic transitions between planetary environments:
- * 1. Deep Space / Solar System (Twinkling stars, cosmic nebula)
- * 2. The Moon (Vacuum black, high-contrast stars, silver regolith glimmer)
- * 3. Mars (Rich rust-red atmosphere, iron-oxide dust storm particles)
+ * Canvas engine that creates an unmistakable, cinematic visual distinction between:
+ * 1. Deep Space (Solar System & Map) -> Midnight blue-black starry void
+ * 2. The Moon -> High-contrast monochrome lunar vacuum with brilliant silver regolith crystals
+ * 3. Mars -> Rich, warm rust-orange and red iron-oxide dust storm atmosphere
  */
-export default function BackgroundAtmosphere({ activeMission, isInHeroView }) {
+export default function BackgroundAtmosphere({ currentEnvironment = 'space' }) {
   const canvasRef = useRef(null);
 
   // Target theme RGB & particle properties
   const targetThemeRef = useRef({
     topR: 10, topG: 14, topB: 24,
-    botR: 4, botG: 5, botB: 8,
-    particleColor: 'rgba(180, 210, 255, 0.6)',
+    botR: 3, botG: 4, botB: 8,
+    particleColor: 'rgba(200, 225, 255, 0.7)',
     particleType: 'stars',
     speed: 0.3,
-    densityFactor: 1
+    glow: 'rgba(56, 189, 248, 0.15)'
   });
 
   // Current interpolated theme
   const currentThemeRef = useRef({
     topR: 10, topG: 14, topB: 24,
-    botR: 4, botG: 5, botB: 8,
-    particleColor: 'rgba(180, 210, 255, 0.6)',
+    botR: 3, botG: 4, botB: 8,
+    particleColor: 'rgba(200, 225, 255, 0.7)',
     particleType: 'stars',
     speed: 0.3,
-    densityFactor: 1
+    glow: 'rgba(56, 189, 248, 0.15)'
   });
 
   useEffect(() => {
-    if (isInHeroView) {
-      // Cosmic Solar System Space View
+    if (currentEnvironment === 'mars') {
+      // DRAMATIC VIBRANT MARS EFFECT
       targetThemeRef.current = {
-        topR: 16, topG: 20, topB: 35,
-        botR: 4, botG: 5, botB: 10,
-        particleColor: 'rgba(210, 230, 255, 0.6)',
+        topR: 95, topG: 28, topB: 14,       // Vivid Martian rust red
+        botR: 26, botG: 7, botB: 4,         // Dark Martian bedrock
+        particleColor: 'rgba(255, 115, 55, 0.85)', // Glowing red-orange dust particles
+        particleType: 'dust',
+        speed: 0.85,
+        glow: 'rgba(239, 68, 68, 0.35)'
+      };
+    } else if (currentEnvironment === 'moon') {
+      // DRAMATIC STARK LUNAR EFFECT
+      targetThemeRef.current = {
+        topR: 18, topG: 22, topB: 32,       // Deep silver-tinted space black
+        botR: 4, botG: 5, botB: 8,          // Absolute lunar vacuum
+        particleColor: 'rgba(240, 248, 255, 0.95)', // Brilliant silver regolith crystals & stars
+        particleType: 'lunar_regolith',
+        speed: 0.35,
+        glow: 'rgba(224, 231, 255, 0.25)'
+      };
+    } else {
+      // DEEP COSMIC SPACE / SOLAR SYSTEM EFFECT
+      targetThemeRef.current = {
+        topR: 12, topG: 16, topB: 30,       // Cosmic deep space navy
+        botR: 3, botG: 4, botB: 8,          // Void
+        particleColor: 'rgba(190, 220, 255, 0.7)',
         particleType: 'stars',
         speed: 0.25,
-        densityFactor: 1
+        glow: 'rgba(6, 182, 212, 0.2)'
       };
-      return;
     }
-
-    if (!activeMission) return;
-
-    if (activeMission.celestialBody === 'mars') {
-      // MARS EFFECT: Rich rust-orange and red dust
-      if (activeMission.id === 'opportunity') {
-        targetThemeRef.current = {
-          topR: 78, topG: 26, topB: 14,
-          botR: 24, botG: 8, botB: 5,
-          particleColor: 'rgba(240, 110, 60, 0.75)',
-          particleType: 'dust',
-          speed: 0.8,
-          densityFactor: 1.3
-        };
-      } else if (activeMission.id === 'spirit-rover') {
-        targetThemeRef.current = {
-          topR: 72, topG: 30, topB: 16,
-          botR: 22, botG: 9, botB: 6,
-          particleColor: 'rgba(245, 125, 70, 0.7)',
-          particleType: 'dust',
-          speed: 0.75,
-          densityFactor: 1.2
-        };
-      } else if (activeMission.id === 'viking1-lander') {
-        targetThemeRef.current = {
-          topR: 68, topG: 32, topB: 18,
-          botR: 20, botG: 10, botB: 7,
-          particleColor: 'rgba(235, 130, 75, 0.7)',
-          particleType: 'dust',
-          speed: 0.6,
-          densityFactor: 1.1
-        };
-      } else {
-        // InSight / Sojourner / generic Mars
-        targetThemeRef.current = {
-          topR: 65, topG: 28, topB: 16,
-          botR: 18, botG: 8, botB: 6,
-          particleColor: 'rgba(245, 120, 70, 0.7)',
-          particleType: 'dust',
-          speed: 0.65,
-          densityFactor: 1.2
-        };
-      }
-    } else {
-      // MOON EFFECT: Stark vacuum black with crystalline silver regolith & brilliant stars
-      if (activeMission.id === 'apollo15-lrv') {
-        targetThemeRef.current = {
-          topR: 24, topG: 28, topB: 36,
-          botR: 6, botG: 7, botB: 10,
-          particleColor: 'rgba(220, 235, 255, 0.55)',
-          particleType: 'lunar_regolith',
-          speed: 0.35,
-          densityFactor: 0.9
-        };
-      } else if (activeMission.id === 'surveyor3-apollo12') {
-        targetThemeRef.current = {
-          topR: 22, topG: 26, topB: 34,
-          botR: 6, botG: 7, botB: 9,
-          particleColor: 'rgba(210, 230, 255, 0.5)',
-          particleType: 'lunar_regolith',
-          speed: 0.3,
-          densityFactor: 0.85
-        };
-      } else {
-        // Apollo 11 LRRR / deep space optical laser corridor
-        targetThemeRef.current = {
-          topR: 15, topG: 22, topB: 38,
-          botR: 5, botG: 6, botB: 12,
-          particleColor: 'rgba(190, 225, 255, 0.65)',
-          particleType: 'stars',
-          speed: 0.3,
-          densityFactor: 1
-        };
-      }
-    }
-  }, [activeMission, isInHeroView]);
+  }, [currentEnvironment]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -137,7 +81,7 @@ export default function BackgroundAtmosphere({ activeMission, isInHeroView }) {
 
     window.addEventListener('resize', handleResize);
 
-    const PARTICLE_COUNT = 85;
+    const PARTICLE_COUNT = 90;
     let particles = [];
 
     const initParticles = () => {
@@ -146,7 +90,7 @@ export default function BackgroundAtmosphere({ activeMission, isInHeroView }) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          radius: Math.random() * 2.2 + 0.6,
+          radius: Math.random() * 2.4 + 0.6,
           vx: (Math.random() - 0.5) * 0.5,
           vy: Math.random() * 0.5 + 0.1,
           opacity: Math.random() * 0.7 + 0.3,
@@ -165,20 +109,20 @@ export default function BackgroundAtmosphere({ activeMission, isInHeroView }) {
       const cur = currentThemeRef.current;
       const tgt = targetThemeRef.current;
 
-      // Smooth color morphing (frame-by-frame interpolation)
-      cur.topR = lerp(cur.topR, tgt.topR, 0.035);
-      cur.topG = lerp(cur.topG, tgt.topG, 0.035);
-      cur.topB = lerp(cur.topB, tgt.topB, 0.035);
+      // Responsive interpolation factor for swift transitions
+      cur.topR = lerp(cur.topR, tgt.topR, 0.06);
+      cur.topG = lerp(cur.topG, tgt.topG, 0.06);
+      cur.topB = lerp(cur.topB, tgt.topB, 0.06);
 
-      cur.botR = lerp(cur.botR, tgt.botR, 0.035);
-      cur.botG = lerp(cur.botG, tgt.botG, 0.035);
-      cur.botB = lerp(cur.botB, tgt.botB, 0.035);
+      cur.botR = lerp(cur.botR, tgt.botR, 0.06);
+      cur.botG = lerp(cur.botG, tgt.botG, 0.06);
+      cur.botB = lerp(cur.botB, tgt.botB, 0.06);
 
-      // Radial atmospheric backdrop
+      // Create radial atmospheric gradient
       const gradient = ctx.createRadialGradient(
         width * 0.5,
         height * 0.2,
-        40,
+        30,
         width * 0.5,
         height * 0.7,
         Math.max(width, height)
@@ -213,11 +157,11 @@ export default function BackgroundAtmosphere({ activeMission, isInHeroView }) {
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
 
         if (tgt.particleType === 'dust') {
-          // Martian reddish iron-oxide dust
-          ctx.fillStyle = tgt.particleColor.replace('0.7', `${currentAlpha}`);
+          // Warm Martian dust motes
+          ctx.fillStyle = tgt.particleColor.replace('0.85', `${currentAlpha * 0.85}`);
         } else {
-          // Lunar stars / regolith glimmer
-          ctx.fillStyle = tgt.particleColor.replace('0.6', `${currentAlpha}`);
+          // High-contrast lunar regolith silver crystals / stars
+          ctx.fillStyle = tgt.particleColor.replace('0.95', `${currentAlpha * 0.95}`);
         }
         ctx.fill();
       });
@@ -234,13 +178,13 @@ export default function BackgroundAtmosphere({ activeMission, isInHeroView }) {
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-all duration-1000">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden transition-all duration-700">
       <canvas ref={canvasRef} className="w-full h-full block" />
-      {/* Subtle vignette filter */}
+      {/* Dynamic planetary horizon glow */}
       <div 
-        className="absolute inset-0 opacity-25 pointer-events-none"
+        className="absolute inset-0 opacity-30 pointer-events-none transition-colors duration-700"
         style={{
-          backgroundImage: 'radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.85) 100%)',
+          backgroundImage: 'radial-gradient(circle at 50% 15%, transparent 30%, rgba(0, 0, 0, 0.8) 100%)',
         }}
       />
     </div>

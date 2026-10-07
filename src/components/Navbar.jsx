@@ -1,9 +1,5 @@
-import React, { useState } from 'react';
-import { 
-  Rocket, Map, BookOpen, Volume2, VolumeX, 
-  Database, GraduationCap, Award, Radio, Sparkles 
-} from 'lucide-react';
-import { spaceAudio } from '../utils/audioSystem';
+import React from 'react';
+import { Rocket, Map, BookOpen, Database, GraduationCap, Award } from 'lucide-react';
 
 export default function Navbar({ 
   badgeCount, 
@@ -13,21 +9,6 @@ export default function Navbar({
   onScrollToMap,
   onScrollToStories
 }) {
-  const [isWindActive, setIsWindActive] = useState(false);
-
-  const toggleMartianWind = () => {
-    if (isWindActive) {
-      spaceAudio.stopMartianWind();
-      setIsWindActive(false);
-    } else {
-      spaceAudio.startMartianWind();
-      setIsWindActive(true);
-    }
-  };
-
-  const playChime = () => {
-    spaceAudio.playQuindarTone();
-  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 px-4 py-3 pointer-events-none">
@@ -71,31 +52,6 @@ export default function Navbar({
 
         {/* Right Tools & Extras */}
         <div className="flex items-center gap-2">
-          
-          {/* Ambient Wind Synthesizer */}
-          <button
-            onClick={toggleMartianWind}
-            className={`p-2 rounded-xl text-xs font-mono transition flex items-center gap-1.5 border ${
-              isWindActive
-                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 animate-pulse'
-                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
-            }`}
-            title="Toggle authentic Martian Wind sound (InSight pressure acoustics)"
-          >
-            {isWindActive ? <Volume2 className="w-4 h-4 text-amber-400" /> : <VolumeX className="w-4 h-4" />}
-            <span className="hidden lg:inline text-[11px] font-bold">
-              {isWindActive ? 'Martian Wind: ON' : 'Wind Audio'}
-            </span>
-          </button>
-
-          {/* Apollo Radio Quindar tone test */}
-          <button
-            onClick={playChime}
-            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-cyan-300 transition"
-            title="Play Apollo Quindar Radio Beep"
-          >
-            <Radio className="w-4 h-4" />
-          </button>
 
           {/* Badges Counter */}
           <div className="flex items-center gap-1.5 bg-amber-950/60 border border-amber-500/40 text-amber-300 px-2.5 py-1.5 rounded-xl text-xs font-bold font-mono">

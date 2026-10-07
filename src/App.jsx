@@ -11,7 +11,7 @@ import { Award, ExternalLink } from 'lucide-react';
 
 export default function App() {
   const [activeMissionId, setActiveMissionId] = useState(HARDWARE_REGISTRY[0].id);
-  const [isInHeroView, setIsInHeroView] = useState(true);
+  const [currentEnvironment, setCurrentEnvironment] = useState('space'); // 'space' | 'moon' | 'mars'
   const [unlockedBadges, setUnlockedBadges] = useState(new Set());
   const [isDataModalOpen, setIsDataModalOpen] = useState(false);
   const [isEducatorModalOpen, setIsEducatorModalOpen] = useState(false);
@@ -19,43 +19,57 @@ export default function App() {
 
   const activeMission = HARDWARE_REGISTRY.find((m) => m.id === activeMissionId) || HARDWARE_REGISTRY[0];
 
-  // IntersectionObserver to detect whether in hero view or which story is centered in viewport
+  // Dynamic scroll tracker that reliably identifies whether you're in Space, Moon, or Mars
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      if (scrollY < 380) {
-        setIsInHeroView(true);
-      } else {
-        setIsInHeroView(false);
+      const centerY = window.innerHeight / 2;
+
+      // 1. Check Solar System Hero
+      const heroEl = document.getElementById('solar-system-hero');
+      if (heroEl) {
+        const rect = heroEl.getBoundingClientRect();
+        if (rect.top <= centerY && rect.bottom >= centerY) {
+          setCurrentEnvironment('space');
+          return;
+        }
+      }
+
+      // 2. Check Planetary Map
+      const mapEl = document.getElementById('planetary-map-section');
+      if (mapEl) {
+        const rect = mapEl.getBoundingClientRect();
+        if (rect.top <= centerY && rect.bottom >= centerY) {
+          setCurrentEnvironment('space');
+          return;
+        }
+      }
+
+      // 3. Find closest story card to viewport center
+      const cards = document.querySelectorAll('article[data-mission-id]');
+      let closestMission = null;
+      let minDistance = Infinity;
+
+      cards.forEach((card) => {
+        const rect = card.getBoundingClientRect();
+        const cardCenter = (rect.top + rect.bottom) / 2;
+        const dist = Math.abs(cardCenter - centerY);
+        if (dist < minDistance) {
+          minDistance = dist;
+          const missionId = card.getAttribute('data-mission-id');
+          closestMission = HARDWARE_REGISTRY.find((m) => m.id === missionId);
+        }
+      });
+
+      if (closestMission) {
+        setActiveMissionId(closestMission.id);
+        setCurrentEnvironment(closestMission.celestialBody); // 'moon' or 'mars'
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Trigger immediately on mount
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const missionId = entry.target.getAttribute('data-mission-id');
-            if (missionId) {
-              setActiveMissionId(missionId);
-            }
-          }
-        });
-      },
-      {
-        rootMargin: '-30% 0px -30% 0px',
-        threshold: 0.2
-      }
-    );
-
-    const cards = document.querySelectorAll('article[data-mission-id]');
-    cards.forEach((card) => observer.observe(card));
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      cards.forEach((card) => observer.unobserve(card));
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleUnlockBadge = (missionId) => {
@@ -97,7 +111,7 @@ export default function App() {
   return (
     <div className="relative min-h-screen text-slate-100 font-sans selection:bg-cyan-500 selection:text-black">
       {/* Dynamic LERP background with particle canvas (Solar System -> Moon -> Mars) */}
-      <BackgroundAtmosphere activeMission={activeMission} isInHeroView={isInHeroView} />
+      <BackgroundAtmosphere currentEnvironment={currentEnvironment} />
 
       {/* Persistent Navigation Header */}
       <Navbar
@@ -123,7 +137,10 @@ export default function App() {
         <section id="planetary-map-section" className="py-8 scroll-mt-24">
           <PlanetaryMap
             selectedMissionId={activeMissionId}
-            onSelectMission={(m) => setActiveMissionId(m.id)}
+            onSelectMission={(m) => {
+              setActiveMissionId(m.id);
+              setCurrentEnvironment(m.celestialBody);
+            }}
             onScrollToStory={scrollToStory}
           />
         </section>
@@ -138,7 +155,7 @@ export default function App() {
               Voices in the Extraterrestrial Silence
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 mt-2">
-              Scroll down from mission to mission to experience the real physics, hardware, and changing planetary atmospheres.
+              Scroll down to witness how the background transforms between the stark lunar vacuum and the rust-red Martian dust storm.
             </p>
           </div>
 
